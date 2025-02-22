@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Yes/No Read-Only Widget - Optimized</title>
+  <script type="text/javascript">
+    // This function is called once the JotFormCustomWidget library has loaded.
+    function onLoadCallback() {
+      console.log("JotFormCustomWidget library loaded.");
+
+        // Subscribe to the parent's "ready" event so that the form is fully loaded.
+        JFCustomWidget.subscribe("ready", function() {
+            console.log("Parent form is ready. Fetching value of q7_yesOr...");
+            // Listen for messages from the parent site
+            window.addEventListener('message', function(event) {
+                // Validate the origin for security
+                if (event.origin !== "https://www.jotform.com/") {
+                    console.warn("Unauthorized message origin");
+                    return;
+                }
+
+                // Handle the received data
+                var data = event.data;
+
+                // Find the input field by its ID and set its value to the received message
+                var displayField = document.getElementById("displayField");
+                displayField.value = data.message;  // Setting the message received in the input field
+            });
+        });
+    
+
+      // Subscribe to the form's "submit" event so the widget's value is sent with the submission.
+      JFCustomWidget.subscribe("submit", function() {
+        var displayField = document.getElementById("displayField");
+        var result = {
+          valid: true,             // Mark as valid so the widget passes any required checks
+          value: displayField.value  // The current value from the read-only text box
+        };
+        console.log("Submitting widget value:", result);
+        JFCustomWidget.sendSubmit(result);
+      });
+    };
+
+    // Asynchronously load the JotFormCustomWidget library with an onload callback.
+    (function() {
+      var po = document.createElement('script');
+      po.type = 'text/javascript';
+      po.async = true;
+      po.src = "//js.jotform.com/JotFormCustomWidget.min.js?onload=onLoadCallback";
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(po, s);
+    })();
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .read-only-box {
+      width: 100%;
+      padding: 8px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+    button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h2>Yes/No Read-Only Widget - Optimized</h2>
+  <label for="displayField">Selected value (read-only):</label>
+  <input type="text" id="displayField" class="text-box" />
+  <!-- Optional button to manually refresh the value -->
+  <!-- <button onclick="JFCustomWidget.getFieldsValueByName(['q7_yesOr'], function(data) {
+      document.getElementById('displayField').value = (data && data['q7_yesOr']) ? data['q7_yesOr'] : 'No selection made';
+  });">
+    Refresh Value
+  </button> -->
+</body>
+</html>
